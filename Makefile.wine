@@ -34,6 +34,17 @@ clean:
 
 dg: clean alldebug debug
 
-do: clean all exe
+comp:
+	riscv64-unknown-elf-gcc \
+	-march=rv32i \
+	-mabi=ilp32 \
+	-nostdlib \
+	-ffreestanding \
+	-T ./code/linker.ld \
+	./code/start.S \
+	./code/main.c \
+	-o ./bin/main.elf
+
+do: clean comp all exe
 
 # === Makefile.wine ===

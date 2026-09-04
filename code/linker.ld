@@ -5,6 +5,12 @@ MEMORY
     RAM (rwx) : ORIGIN = 0x80000000, LENGTH = 16M
 }
 
+PHDRS
+{
+    text PT_LOAD FLAGS(5); /* read + execute */
+    data PT_LOAD FLAGS(6); /* read + write */
+}
+
 SECTIONS
 {
     .text :
@@ -13,19 +19,21 @@ SECTIONS
 
         KEEP(*(.text.entry))
         *(.text*)
-    } > RAM
+    } > RAM :text
 
     .rodata :
     {
         . = ALIGN(4);
         *(.rodata*)
-    } > RAM
+    } > RAM :text
+
+    . = ALIGN(CONSTANT(MAXPAGESIZE));
 
     .data :
     {
         . = ALIGN(4);
         *(.data*)
-    } > RAM
+    } > RAM :data
 
     .bss :
     {
@@ -37,7 +45,7 @@ SECTIONS
         *(COMMON)
 
         __bss_end = .;
-    } > RAM
+    } > RAM :data
 
     . = ALIGN(16);
 

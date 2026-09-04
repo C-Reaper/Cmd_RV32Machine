@@ -33,9 +33,14 @@ static void uart_getline(char* buffer,int max_length){
     int ch = -1;
     int i = 0;
 
-    for(; i < max_length - 1 && ch != '\n'; i++){
+    while(i < max_length - 1 && ch != '\n'){
         while ((ch = uart_getc()) == -1) {}
+        if(ch == '\b'){
+            if(i > 0) i--;
+            continue;
+        }
         buffer[i] = (char)ch;
+        i++;
     }
 
     buffer[i] = '\0';

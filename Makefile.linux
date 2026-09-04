@@ -43,7 +43,7 @@ comp:
 clean:
 	rm -rf $(BUILD_DIR)/*
 
-do: clean all exe
+do: clean comp all exe
 
 dg: clean alldebug debug
 
