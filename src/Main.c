@@ -1,4 +1,4 @@
-#define RV32MACHINE_DEBUG
+//#define RV32MACHINE_DEBUG
 
 #if defined(__linux__)
 #include "/home/codeleaded/System/Static/Library/RV32Machine.h"

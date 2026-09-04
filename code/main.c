@@ -1,27 +1,64 @@
 #include <stdint.h>
 
-volatile uint8_t* UART = (uint8_t*)0x10000000;
+extern void RV32_Exit(int code);
 
-static void putc(char c){
-    *UART = (uint8_t)c;
+#define UART_BASE 0x10000000U
+#define UART_RBR  0x00U
+#define UART_LSR  0x05U
+#define UART_LSR_DR 0U
+#define UART_LSR_THRE 5U
+
+static volatile uint8_t* const uart_register(uint32_t offset){
+    return (volatile uint8_t*)(UART_BASE + offset);
+}
+static void uart_putc(char value){
+    volatile uint8_t* const lsr = uart_register(UART_LSR);
+    while (((*lsr >> UART_LSR_THRE) & 1U) == 0U) {}
+    *uart_register(UART_RBR) = (uint8_t)value;
+}
+static void uart_puts(const char* text){
+    while(*text){
+        uart_putc(*text++);
+    }
 }
 
-static void puts(const char *s){
-    while (*s)
-        putc(*s++);
+static int uart_getc(void){
+    volatile uint8_t* const lsr = uart_register(UART_LSR);
+    if(((*lsr >> UART_LSR_DR) & 1U) == 0U){
+        return -1;
+    }
+    return *uart_register(UART_RBR);
+}
+static void uart_getline(char* buffer,int max_length){
+    int ch = -1;
+    int i = 0;
+
+    for(; i < max_length - 1 && ch != '\n'; i++){
+        while ((ch = uart_getc()) == -1) {}
+        buffer[i] = (char)ch;
+    }
+
+    buffer[i] = '\0';
 }
 
 int main(void){
-    puts("Hello from RISC-V!\n");
+    uart_puts("Hello from RISC-V!\n");
 
     uint32_t a = 123;
     uint32_t b = 456;
     uint32_t c = a + b;
 
     if (c == 579)
-        puts("ADD: OK\n");
+        uart_puts("ADD: OK\n");
     else
-        puts("ADD: FAIL\n");
+        uart_puts("ADD: FAIL\n");
 
+    char buffer[128];
+    uart_puts("Enter a line: ");
+    uart_getline(buffer, sizeof(buffer));
+
+    uart_puts("\nReceived Buffer: \"");
+    uart_puts(buffer);
+    uart_puts("\"\n");
     return 0;
 }
