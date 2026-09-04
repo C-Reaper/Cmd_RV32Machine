@@ -11,10 +11,10 @@
 #endif
 
 int main(){
-    RV32Machine rv32 = RV32Machine_New();
-    //RV32Machine_Load_From(&rv32,"./data/rom.rv32");
-    RV32Machine_Print(&rv32);
-    RV32Machine_Start(&rv32);
-    RV32Machine_Free(&rv32);
+    RV32Machine rv = RV32Machine_New();
+    RV32Machine_Load_From(&rv,"./bin/main.elf");
+    RV32Machine_Print(&rv);
+    RV32Machine_Start(&rv);
+    RV32Machine_Free(&rv);
     return 0;
 }
