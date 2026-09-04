@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-volatile uint8_t *UART = (uint8_t *)0x10000000;
+volatile uint8_t* UART = (uint8_t*)0x10000000;
 
 static void putc(char c){
     *UART = (uint8_t)c;
